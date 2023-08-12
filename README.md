@@ -27,12 +27,9 @@ The `FundMe` contract contains the following key components:
 
 The contract features the following functions:
 
-- `constructor()`: Initializes the contract owner.
 - `fund()`: Allows users to send Ether to the contract, becoming funders if the minimum amount requirement is met.
 - `withdraw()`: Allows the contract owner to withdraw all accumulated funds from the contract and distribute them to the funders.
 - `onlyOwner()`: A modifier that restricts access to certain functions to the contract owner.
-- `receive() external payable`: A fallback function that executes the `fund()` function when Ether is sent to the contract.
-- `fallback() external payable`: Another fallback function that also executes the `fund()` function.
 
 ## Usage
 
@@ -43,15 +40,6 @@ To use the FundMe contract, follow these steps:
 3. Fund the contract by sending Ether to it using the `fund()` function.
 4. The contract enforces a minimum amount in USD for funding. Ensure that the sent Ether meets this requirement.
 5. The contract owner can withdraw all the accumulated funds using the `withdraw()` function.
-
-## Contributing
-
-Contributions to this repository are welcome. To contribute, follow these steps:
-
-1. Fork the repository.
-2. Create a new branch for your contribution.
-3. Make your changes and improvements.
-4. Create a pull request describing your changes.
 
 ## License
 
