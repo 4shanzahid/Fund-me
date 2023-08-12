@@ -1,29 +1,73 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import {PriceConverter} from "./PriceConverter.sol";
+
+//custom erros to save gas
+error NotEnoughUSD();
+error CallFailed();
+error NotOwner();
 
 contract FundMe {
+    using PriceConverter for uint256;
 
-    uint256 minimumUsd =5e18;
+    uint256 constant MINIMUM_USD =5e18;
+
+    address[] public funders;
+    mapping (address funder => uint256 amountFunded) public addressToAmountFunded;
+
+    address public immutable i_owner;
+
+    //setting the owner of the contract 
+    constructor() {
+        i_owner = msg.sender; //as we are making the transction by deploying the contract
+    }
+
     //send money to the contract
     function fund() public payable {
+
         //Cannot send less than 5$
-        require(getConversionRate(msg.value) >= minimumUsd , "Not Enough USD");
+         if (msg.value.getConversionRate() < MINIMUM_USD) {
+            revert NotEnoughUSD();
+        }
+        
+        funders.push(msg.sender);
+        addressToAmountFunded[msg.sender] += msg.value;
     }
 
-    function getPrice() public view returns(uint256){
-        //Address 0x694AA1769357215DE4FAC081bf1f309aDC325306
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
-        (,int256 price,,,)=priceFeed.latestRoundData();
-        return uint256(price * 1e10);
+    //withdraw all money
+    function withdraw() public onlyOwner {
+
+        //use for loop to set total amount to 0
+        for(uint256 funderIndex = 0; funderIndex < funders.length; funderIndex++)
+        {
+            address funder = funders[funderIndex];
+            addressToAmountFunded[funder] = 0;
+        }
+
+        //rest the funders array to 0
+        funders = new address[](0);
+
+        //transfer all funds to you wallet
+        (bool callSuccess, ) = payable (msg.sender).call{value: address(this).balance}("");
+        if (!callSuccess) {
+            revert CallFailed();
+        }
     }
 
-    function getConversionRate(uint256 ethAmount) public view returns (uint256){
-        uint256 ethPrice = getPrice();
-        uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;
-        return ethAmountInUsd;
+    modifier onlyOwner() {
+        if (msg.sender != i_owner) {
+            revert NotOwner();
+        }        
+        _; //execute the rest of the code in the function
     }
 
+    //if someone doesnot use fund() to send ETH
+    receive() external payable {
+        fund();
+    } 
 
+    fallback() external payable {
+        fund();
+    }
 }
