@@ -1,5 +1,8 @@
 # FundMe Solidity Smart Contract
 
+![Solidity](https://img.shields.io/badge/Solidity-%23363636.svg?style=for-the-badge&logo=solidity&logoColor=white)
+![Ethereum](https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=Ethereum&logoColor=white)
+
 This repository contains a Solidity smart contract called FundMe. The FundMe contract allows users to send Ether (ETH) to the contract and become funders. It enforces a minimum amount requirement in USD for the sent Ether. The contract owner can withdraw all the funds accumulated from the funders.
 
 ## Table of Contents
@@ -7,7 +10,6 @@ This repository contains a Solidity smart contract called FundMe. The FundMe con
 - [Introduction](#introduction)
 - [Contract Details](#contract-details)
 - [Usage](#usage)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## Introduction
